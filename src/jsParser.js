@@ -40,7 +40,7 @@ function executor(expression,forcereturn){
             const params = expression['parameters']
                 .map((parm)=>parm['text'])
                 .reduce((acc,param)=> acc+', '+param);
-            result+= "__MEMOAIZER(function("+params+"){"
+            result+= "__MEMOIZER(function("+params+"){"
             result+=executor(expression['value'],true)
             result+="})"
             break
@@ -109,8 +109,8 @@ function executor(expression,forcereturn){
     return result
 }
 
-function memoaizer(){
-    return `const __MEMOAIZER = fn => {
+function memoizer(){
+    return `const __MEMOIZER = fn => {
         const cache = new Map();
         return (...args) => {
           const key = args.join('-');
@@ -133,7 +133,7 @@ function memoaizer(){
 module.exports = {
     jsExecutor: executor,
     preLib: function (){
-        return memoaizer()
+        return memoizer()
     }
 }
 
