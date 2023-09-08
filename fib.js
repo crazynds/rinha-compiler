@@ -1,1 +1,0 @@
-let fib = function(n){if((undefined<2)){return undefined;}else{return (fib((undefined-1))+fib((undefined-2)));}};;console.log(fib(10))
