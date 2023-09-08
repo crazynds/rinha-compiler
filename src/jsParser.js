@@ -33,16 +33,16 @@ function decalre_error(msg,location,found){
     return new Error(msg+" at "+location['start']+' (in file '+location['filename']+') but got '+JSON.stringify(found))
 }
 
-module.exports = function executor(expression,forcereturn){
+function executor(expression,forcereturn){
     var result = ''
     switch(expression['kind']){
         case 'Function':
             const params = expression['parameters']
                 .map((parm)=>parm['text'])
                 .reduce((acc,param)=> acc+', '+param);
-            result+= "function("+params+"){"
+            result+= "__MEMOAIZER(function("+params+"){"
             result+=executor(expression['value'],true)
-            result+="}"
+            result+="})"
             break
         case 'Let':
             result = 'let '+ expression['name']['text']
@@ -107,5 +107,33 @@ module.exports = function executor(expression,forcereturn){
     forcereturn &= TermReturn[expression['kind']]
     if(forcereturn)result = 'return '+result+';'
     return result
+}
+
+function memoaizer(){
+    return `const __MEMOAIZER = fn => {
+        const cache = new Map();
+        return (...args) => {
+          const key = args.join('-');
+          if(!!cache[key]) {
+            return cache[key]
+          }
+          const result = fn(...args);
+          cache[key] = result;
+          return result;
+        }
+      };
+      `.replaceAll('\n','')
+        .replaceAll('\t','')
+        .replaceAll('  ',' ')
+        .replaceAll('  ',' ')
+        .replaceAll('  ',' ')
+}
+
+
+module.exports = {
+    jsExecutor: executor,
+    preLib: function (){
+        return memoaizer()
+    }
 }
 
